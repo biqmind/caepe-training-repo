@@ -1,0 +1,34 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tls-lab-auth-nginx-ingress
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+    traefik.ingress.kubernetes.io/router.middlewares: training-lab-lab-auth@kubernetescrd
+  namespace: training-lab
+spec:
+  rules:
+    - host: tls-auth-nginx.LABSERVERNAME
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: lab-nginx-service
+              port: 
+                number: 80
+  tls:
+   - secretName: traefik-ui-tls-cert
+
+---
+
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: lab-auth
+  namespace: training-lab
+spec:
+  basicAuth:
+    secret: lab-secret
